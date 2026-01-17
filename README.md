@@ -4,9 +4,7 @@ A collection of useful JavaScript scripts and CSS snippets to enhance your [Jell
 
 ## ⚠️ Disclaimer
 - These snippets are created by a new Jellyfin user (me). They prioritize compatibility over performance or efficiency.  
-  Feel free to reuse, improve, or contribute.
-- My JavaScript scripts are experimental and may rely on frequent `setInterval` checks, which can affect performance depending on your configuration.  
-  Use them at your own discretion. Optimizations are possible by replacing intervals with event-based listeners where applicable.
+- My JavaScript scripts are experimental and may rely on frequent `setInterval` checks, which can affect performance depending on your configuration : Use them at your own discretion. Optimizations are possible by replacing intervals with event-based listeners where applicable.
 
 ## 🛠️ Prerequisites
 
@@ -35,7 +33,8 @@ A collection of useful JavaScript scripts and CSS snippets to enhance your [Jell
 
 ### Display cards in search suggestion
 
-Replace hyperlinks in search's suggestions with cards
+Replace hyperlinks in search's suggestions with cards.
+
 ![Suggestion](https://i.imgur.com/2gE3kg4.png)
 ```js
 const s = document.createElement("script");
@@ -58,6 +57,7 @@ document.head.appendChild(s);
 ```
 
 ### Allows to remove NextUp items
+
 Improve [KefinTweaks plugin](https://github.com/ranaldsgift/KefinTweaks) to also be able to remove items from NextUp (it currently only allow to remove Watching items) 
 
 ![NextUp](https://i.imgur.com/W3lLf20.png)
@@ -83,8 +83,11 @@ document.head.appendChild(s);
 ```
 
 ### Show Video Theme in Show page
+
 Adds video themes in show details. Ordering for Openings/Endings is supported. Built-in player in a modal.
+
 ![Video Theme](https://i.imgur.com/gUiAvGD.png)
+
 ```js
 const s = document.createElement("script");
 s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/display-video-theme.js";
@@ -93,6 +96,7 @@ document.head.appendChild(s);
 ```
 
 ### Random dice on everything
+
 Improve [Jellyfin-Enhanced](https://github.com/n00bcodr/Jellyfin-Enhanced) to add random dice to all vertical categories in home sections.
 
 ![Dice](https://i.imgur.com/b5NXtAP.png)
@@ -105,6 +109,7 @@ document.head.appendChild(s);
 ```
 
 ### Remove HTML tags from MediaBar description
+
 A small fix for [Media Bar](https://github.com/IAmParadox27/jellyfin-plugin-media-bar) to remove buggy HTML tags from Shows descriptions.
 
 ```js
@@ -127,7 +132,9 @@ document.head.appendChild(s);
 ```
 
 ## All-in-one (JS and CSS)
+
 To get everything in one JS. Not very customizable, but very convenient.
+
 ```js
 const s = document.createElement("script");
 s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/all.js";
