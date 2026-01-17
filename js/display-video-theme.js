@@ -1,5 +1,5 @@
 /*
-    Display video themes for items on their detail pages.
+    Display video themes for items on their detail pages. Supports OP/ED ordering for anime.
 */
 
 const interval = setInterval(() => {
