@@ -1,0 +1,7 @@
+/*
+    This will hide the "My Media" section from the Jellyfin homepage.
+*/
+
+#homeTab .MyMedia h2:first-of-type {
+    display: none;
+}

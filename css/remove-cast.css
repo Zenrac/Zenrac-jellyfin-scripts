@@ -1,0 +1,7 @@
+/*
+    This will remove the cast section from media pages.
+*/
+
+#castCollapsible {
+    display: none;
+}

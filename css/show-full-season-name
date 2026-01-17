@@ -1,0 +1,10 @@
+/*
+    This will show the full season/movie name instead of truncating it.
+*/
+
+a[data-type="Season"],
+a[data-type="Movie"] {
+  white-space: normal;
+  text-overflow: clip;
+  overflow: visible;
+}
