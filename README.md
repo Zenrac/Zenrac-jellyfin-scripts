@@ -4,7 +4,7 @@ A collection of useful JavaScript scripts and CSS snippets to enhance your [Jell
 
 ## ⚠️ Disclaimer
 - These snippets are created by a new Jellyfin user (me). They prioritize compatibility over performance or efficiency.  
-- My JavaScript scripts are experimental and may rely on frequent `setInterval` checks, which can affect performance depending on your configuration : Use them at your own discretion. Optimizations are possible by replacing intervals with event-based listeners where applicable.
+- My JavaScript scripts are experimental and may rely on frequent `setInterval` checks, which can affect performance depending on your setup. Use them at your own discretion. Optimizations are possible by replacing intervals with event-based listeners where applicable.
 
 ## 🛠️ Prerequisites
 
@@ -29,7 +29,7 @@ A collection of useful JavaScript scripts and CSS snippets to enhance your [Jell
 @import url("https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/css/show-full-season-name.css");
 ```
 
-## Javascript Scripts
+## JavaScript Scripts
 
 ### Display cards in search suggestion
 
@@ -43,9 +43,11 @@ s.async = true;
 document.head.appendChild(s);
 ```
 
+---
+
 ### Clickable Header Logo
 
-Allow to click header logo to return Home. Also replaces the behavior when clicking the 'Home' tab to match clicking 'Home' in the menu because it fixes some issue with [Media Bar Plugin](https://github.com/IAmParadox27/jellyfin-plugin-media-bar). 
+Allows clicking the header logo to return Home. Also modifies the 'Home' tab behavior to match the 'Home' in menu, fixing a issue with [Media Bar Plugin](https://github.com/IAmParadox27/jellyfin-plugin-media-bar). 
 
 ![Clickable Header Logo](https://i.imgur.com/MV60FW9.png)
 
@@ -56,9 +58,11 @@ s.async = true;
 document.head.appendChild(s);
 ```
 
-### Allows to remove NextUp items
+---
 
-Improve [KefinTweaks plugin](https://github.com/ranaldsgift/KefinTweaks) to also be able to remove items from NextUp (it currently only allow to remove Watching items) 
+### Remove Next Up Items
+
+Enhances the [KefinTweaks plugin](https://github.com/ranaldsgift/KefinTweaks) to also be able to remove items from Next Up (it currently only allows removing Watching items)
 
 ![NextUp](https://i.imgur.com/W3lLf20.png)
 
@@ -68,10 +72,11 @@ s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/re
 s.async = true;
 document.head.appendChild(s);
 ```
+---
 
-### Add a "open player" icon when playing a video theme
+### Video Theme Player Modal
 
-When enabling `Settings > Display > Theme videos` it adds a clickable button to open the video theme player in a modal.
+Enabling `Settings > Display > Theme videos` adds a button to open the video theme player in a modal.
 
 ![Open player](https://i.imgur.com/mQWxps5.png)
 
@@ -82,7 +87,9 @@ s.async = true;
 document.head.appendChild(s);
 ```
 
-### Show Video Theme in Show page
+---
+
+### Video Themes List
 
 Adds video themes in show details. Ordering for Openings/Endings is supported. Built-in player in a modal.
 
@@ -95,9 +102,11 @@ s.async = true;
 document.head.appendChild(s);
 ```
 
-### Random dice on everything
+---
 
-Improve [Jellyfin-Enhanced](https://github.com/n00bcodr/Jellyfin-Enhanced) to add random dice to all vertical categories in home sections.
+### Random dice on home sections
+
+Improves [Jellyfin-Enhanced](https://github.com/n00bcodr/Jellyfin-Enhanced) to add random dice to all vertical categories in home sections.
 
 ![Dice](https://i.imgur.com/b5NXtAP.png)
 
@@ -108,7 +117,9 @@ s.async = true;
 document.head.appendChild(s);
 ```
 
-### Remove HTML tags from MediaBar description
+---
+
+### Remove HTML Tags in MediaBar 
 
 A small fix for [Media Bar](https://github.com/IAmParadox27/jellyfin-plugin-media-bar) to remove buggy HTML tags from Shows descriptions.
 
@@ -119,10 +130,12 @@ s.async = true;
 document.head.appendChild(s);
 ```
 
-### Remove Dark Reader
+---
 
-Dark Reader is a very popular extension but it causes issues with Jellyfin. 
-Using this script will tell the extension to ignore your page.
+### Remove Dark Reader extension
+
+[Dark Reader](https://darkreader.org/) is a very popular extension but it causes issues with Jellyfin. 
+This script forces the extension to ignore your pages.
 
 ```js
 const s = document.createElement("script");
@@ -131,9 +144,11 @@ s.async = true;
 document.head.appendChild(s);
 ```
 
+---
+
 ## All-in-one (JS and CSS)
 
-To get everything in one JS. Not very customizable, but very convenient.
+To get everything in one JS. Convenient but not customizable.
 
 ```js
 const s = document.createElement("script");
@@ -142,10 +157,12 @@ s.async = true;
 document.head.appendChild(s);
 ```
 
+---
+
 ## 🤖 AI Assistance
 
 - The banner image at the top was generated with AI.
-- Some JavaScript and CSS code in this repository was assisted by AI, but all code has been carefully reviewed, modified, and critically evaluated before use.
+- Some code was AI-assisted but manually improved, reviewed and tested before use.
 
 ## 🤝 Contribution Guidelines
 
