@@ -1,14 +1,32 @@
-/*
-    Replaces the search suggestions section on the search page with cards instead of links.
-*/
-
 const ITEMS_COUNT = 20;
+
+function getUserId() {
+    const id = window.ApiClient?._currentUser?.Id || null;
+    return id;
+}
+
+function getAuthHeaders() {
+    const token = window.ApiClient?.accessToken?.();
+    return token ? { Authorization: `MediaBrowser Token="${token}"` } : {};
+}
+
+function getServerAddress() { 
+    const server = window.ApiClient?._serverAddress || '';
+    return server;
+}
+
+function getImageUrl(item) {
+    const server = getServerAddress();
+    if (!server || !item.ImageTags || !item.ImageTags.Primary) return '';
+    const url = `${server}/Items/${item.Id}/Images/Primary?fillHeight=446&fillWidth=297&quality=96&tag=${item.ImageTags.Primary}`;
+    return url;
+}
 
 (function injectCSS() {
     const style = document.createElement('style');
     style.textContent = `
         .verticalSection.searchSuggestions {
-            visibility: hidden;
+            visibility: visible;
         }
         .verticalSection.searchSuggestions:has(.custom-scroller) {
             visibility: visible;
@@ -17,41 +35,52 @@ const ITEMS_COUNT = 20;
     document.head.appendChild(style);
 })();
 
-function getUserId() {
-    return window.ApiClient?._currentUser?.Id || null;
-}
+const originalOpen = XMLHttpRequest.prototype.open;
+const originalSend = XMLHttpRequest.prototype.send;
 
-function getAuthHeaders() {
-    const token = window.ApiClient?.accessToken?.();
-    return token ? { Authorization: `MediaBrowser Token="${token}"` } : {};
-}
-
-function getServerAddress() {
-    return window.ApiClient?._serverAddress || '';
-}
-
-function getImageUrl(item) {
-    const server = getServerAddress();
-    if (!server || !item.ImageTags || !item.ImageTags.Primary) return '';
-    return `${server}/Items/${item.Id}/Images/Primary?fillHeight=446&fillWidth=297&quality=96&tag=${item.ImageTags.Primary}`;
-}
-
-async function fetchItems() {
-    const server = getServerAddress();
+XMLHttpRequest.prototype.open = function(method, url, ...args) {
     const userId = getUserId();
-    const headers = getAuthHeaders();
-    if (!server || !userId || !headers) return [];
-    try {
-        const res = await fetch(
-            `${server}/Items?userId=${userId}&limit=${ITEMS_COUNT}&recursive=true&includeItemTypes=Movie,Series&sortBy=IsFavoriteOrLiked,Random&enableImages=true`,
-            { headers }
-        );
-        const data = await res.json();
-        return data.Items || [];
-    } catch {
-        return [];
+    if (
+        userId &&
+        typeof url === 'string' &&
+        url.includes('/Items') &&
+        url.includes(`userId=${userId}`) &&
+        location.hash.startsWith('#/search') &&
+        !url.includes('searchTerm=')
+    ) {
+        const u = new URL(url, location.origin);
+        u.searchParams.set('enableImages', 'true');
+        u.searchParams.delete('imageTypeLimit');
+        url = u.toString();
     }
-}
+    this.__url = url;
+    return originalOpen.call(this, method, url, ...args);
+};
+
+XMLHttpRequest.prototype.send = function(...args) {
+    this.addEventListener('load', () => {
+        const userId = getUserId();
+        if (!userId) return;
+
+        if (
+            this.__url &&
+            this.__url.includes('/Items') &&
+            this.__url.includes(`userId=${userId}`) &&
+            location.hash.startsWith('#/search') &&
+            !this.__url.includes('searchTerm=')
+        ) {
+            let payload;
+            try {
+                payload = JSON.parse(this.responseText);
+            } catch {
+                payload = this.responseText;
+            }
+            startWatchingSuggestions(payload.Items || []);
+        }
+    });
+
+    return originalSend.apply(this, args);
+};
 
 function createCard(item, index) {
     const img = getImageUrl(item);
@@ -80,13 +109,6 @@ function createCard(item, index) {
                 <a href="${href}" class="cardImageContainer coveredImage cardContent itemAction lazy blurhashed lazy-image-fadein-fast"
                    data-action="link" aria-label="${item.Name}"
                    style="background-image:url('${img}');">
-                    ${rating ? `
-                        <div class="rating-overlay-container">
-                            <div class="rating-tag rating-tag-tmdb">
-                                <span class="material-icons rating-star-icon">star</span>
-                                <span class="rating-text">${rating}</span>
-                            </div>
-                        </div>` : ''}
                 </a>
                 <div class="cardOverlayContainer itemAction" data-action="link">
                     <button is="paper-icon-button-light"
@@ -95,22 +117,6 @@ function createCard(item, index) {
                         <span class="material-icons cardOverlayButtonIcon cardOverlayButtonIcon-hover">play_arrow</span>
                     </button>
                     <div class="cardOverlayButton-br flex">
-                        <button type="button" class="watchlist-button cardOverlayButton cardOverlayButton-hover itemAction paper-icon-button-light emby-button"
-                            data-action="none" data-id="${item.Id}" data-active="false">
-                            <span class="material-icons cardOverlayButtonIcon cardOverlayButtonIcon-hover">watchlist</span>
-                        </button>
-                        <button is="emby-playstatebutton" type="button"
-                            class="cardOverlayButton cardOverlayButton-hover itemAction paper-icon-button-light emby-button"
-                            data-id="${item.Id}" data-serverid="${item.ServerId}" data-itemtype="${item.Type}">
-                        </button>
-                        <button is="emby-ratingbutton" type="button"
-                            class="cardOverlayButton cardOverlayButton-hover itemAction paper-icon-button-light emby-button"
-                            data-id="${item.Id}" data-serverid="${item.ServerId}" data-itemtype="${item.Type}">
-                        </button>
-                        <button is="paper-icon-button-light"
-                            class="cardOverlayButton cardOverlayButton-hover itemAction paper-icon-button-light"
-                            data-action="menu">
-                        </button>
                     </div>
                 </div>
             </div>
@@ -126,76 +132,72 @@ function createCard(item, index) {
 }
 
 function isAlreadyReplaced(parent) {
-    return parent.querySelector('.custom-scroller');
+    const exists = parent.querySelector('.custom-scroller');
+    return exists;
 }
 
 function needsReplacement(parent) {
-    return !isAlreadyReplaced(parent) && parent.querySelector('a, button');
+    const needed = !isAlreadyReplaced(parent) && parent.querySelector('a, button');
+    return needed;
 }
 
-async function replaceSuggestionContainer() {
-    if (!location.href.endsWith('/search')) return;
+async function replaceSuggestionContainer(items) {
+    await waitForCardBuilder();
 
     const sections = document.querySelectorAll('.verticalSection.searchSuggestions');
 
     for (const parent of sections) {
         if (!needsReplacement(parent)) continue;
-
-        const items = await fetchItems();
         if (!items.length) continue;
 
-        parent.innerHTML = `
-            <div class="sectionTitleContainer sectionTitleContainer-cards padded-left">
-                <h2 class="sectionTitle sectionTitle-cards">Suggestions</h2>
-            </div>
-            <div is="emby-scroller" data-horizontal="true" data-centerfocus="card"
-                 class="padded-top-focusscale padded-bottom-focusscale emby-scroller custom-scroller"
-                 data-scroll-mode-x="custom">
-                <div is="emby-itemscontainer" class="itemsContainer vertical-wrap"></div>
-            </div>
-        `;
+        parent.innerHTML = '';
 
-        const container = parent.querySelector('[is="emby-itemscontainer"]');
-        items.forEach((item, index) => container.appendChild(createCard(item, index)));
-    }
-}
+        const section = window.cardBuilder.renderCards(
+            items,
+            'Suggestions',
+            null
+        );
 
-let intervalId = null;
+        parent.appendChild(section);
 
-function startReplacing() {
-    if (!intervalId) intervalId = setInterval(replaceSuggestionContainer, 300);
-}
-
-function stopReplacing() {
-    if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-    }
-}
-
-function onPageChange(callback) {
-    let currentUrl = location.href;
-
-    const check = () => {
-        if (currentUrl !== location.href) {
-            currentUrl = location.href;
-            callback(currentUrl);
+        const itemsContainer = parent.querySelector('.itemsContainer');
+        if (itemsContainer) {
+            itemsContainer.classList.add('vertical-wrap');
         }
-    };
+    }
 
-    window.addEventListener('popstate', check);
-    window.addEventListener('hashchange', check);
-
-    const pushState = history.pushState;
-    history.pushState = function () {
-        pushState.apply(this, arguments);
-        check();
-    };
 }
 
-onPageChange(url => {
-    if (url.endsWith('/search')) startReplacing();
-    else stopReplacing();
-});
+let suggestionObserver = null;
 
-if (location.href.endsWith('/search')) startReplacing();
+function startWatchingSuggestions(items) {
+    if (suggestionObserver) return;
+
+    suggestionObserver = new MutationObserver((mutations, obs) => {
+        const sections = document.querySelectorAll('.verticalSection.searchSuggestions');
+        if (sections.length > 0) {
+            replaceSuggestionContainer(items);
+            obs.disconnect();
+            suggestionObserver = null;
+        }
+    });
+
+    suggestionObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
+function waitForCardBuilder(timeout = 5000, interval = 50) {
+    return new Promise((resolve, reject) => {
+        const start = Date.now();
+
+        const check = () => {
+            if (window.cardBuilder) return resolve();
+            if (Date.now() - start > timeout) return reject('window.cardBuilder not available');
+            setTimeout(check, interval);
+        };
+
+        check();
+    });
+}

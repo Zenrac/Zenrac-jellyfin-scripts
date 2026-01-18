@@ -87,6 +87,10 @@ setInterval(function() {
     var videoContainer = document.querySelector('.videoPlayerContainer:not(.themeVideoPlayerContainer)');
     if (!videoContainer) return 
 
+    var videoEl = videoContainer.querySelector('video');
+    if (!videoEl || !videoEl.src) return;
+    if (videoEl.src.startsWith('blob:')) return;
+
     var containers = document.querySelectorAll('.mainDetailButtons.focuscontainer-x')
     var buttonContainer = Array.from(containers).find(c => c.clientWidth > 0 && c.clientHeight > 0)
     if (!buttonContainer) return
