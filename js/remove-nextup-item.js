@@ -1,3 +1,7 @@
+/*
+    Adds a "remove from Next Up" button to items in the Continue Watching / Next Up sections.
+*/
+
 function getUserId() {
     if (!window.ApiClient) return null;    
     return window.ApiClient?._currentUser?.Id;

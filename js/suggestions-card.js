@@ -1,3 +1,8 @@
+
+/*
+    Replaces the search suggestions section on the search page with cards instead of links.
+*/
+
 const ITEMS_COUNT = 20;
 
 function getUserId() {
