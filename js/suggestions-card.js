@@ -3,7 +3,9 @@
     Replaces the search suggestions section on the search page with cards instead of links.
 */
 
-const ITEMS_COUNT = 20;
+const script = document.currentScript;
+const ITEMS_COUNT = script.dataset.itemsCount ? parseInt(script.dataset.itemsCount, 10) : 20;
+const HORIZONTAL_SCROLL = script.dataset.horizontalScroll === "true";
 
 function getUserId() {
     const id = window.ApiClient?._currentUser?.Id || null;
@@ -31,7 +33,7 @@ function getImageUrl(item) {
     const style = document.createElement('style');
     style.textContent = `
         .verticalSection.searchSuggestions {
-            visibility: visible;
+            visibility: hidden;
         }
         .verticalSection.searchSuggestions:has(.custom-scroller) {
             visibility: visible;
@@ -55,6 +57,7 @@ XMLHttpRequest.prototype.open = function(method, url, ...args) {
     ) {
         const u = new URL(url, location.origin);
         u.searchParams.set('enableImages', 'true');
+        u.searchParams.set('limit', ITEMS_COUNT.toString());
         u.searchParams.delete('imageTypeLimit');
         url = u.toString();
     }
@@ -165,12 +168,13 @@ async function replaceSuggestionContainer(items) {
 
         parent.appendChild(section);
 
-        const itemsContainer = parent.querySelector('.itemsContainer');
-        if (itemsContainer) {
-            itemsContainer.classList.add('vertical-wrap');
+        if (!HORIZONTAL_SCROLL) {
+            const itemsContainer = parent.querySelector('.itemsContainer');
+            if (itemsContainer) {
+                itemsContainer.classList.add('vertical-wrap');
+            }
         }
     }
-
 }
 
 let suggestionObserver = null;
