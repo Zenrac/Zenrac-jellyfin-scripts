@@ -38,9 +38,15 @@ function getImageUrl(item) {
         .verticalSection.searchSuggestions:has(.custom-scroller) {
             visibility: visible;
         }
+        ${!HORIZONTAL_SCROLL ? `
+        .custom-scroller-container .emby-scrollbuttons.padded-right {
+            display: none !important;
+        }
+        ` : ''}
     `;
     document.head.appendChild(style);
 })();
+
 
 const originalOpen = XMLHttpRequest.prototype.open;
 const originalSend = XMLHttpRequest.prototype.send;
