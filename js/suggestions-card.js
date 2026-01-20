@@ -12,23 +12,6 @@ function getUserId() {
     return id;
 }
 
-function getAuthHeaders() {
-    const token = window.ApiClient?.accessToken?.();
-    return token ? { Authorization: `MediaBrowser Token="${token}"` } : {};
-}
-
-function getServerAddress() { 
-    const server = window.ApiClient?._serverAddress || '';
-    return server;
-}
-
-function getImageUrl(item) {
-    const server = getServerAddress();
-    if (!server || !item.ImageTags || !item.ImageTags.Primary) return '';
-    const url = `${server}/Items/${item.Id}/Images/Primary?fillHeight=446&fillWidth=297&quality=96&tag=${item.ImageTags.Primary}`;
-    return url;
-}
-
 (function injectCSS() {
     const style = document.createElement('style');
     style.textContent = `
