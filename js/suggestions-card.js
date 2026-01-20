@@ -90,55 +90,6 @@ XMLHttpRequest.prototype.send = function(...args) {
     return originalSend.apply(this, args);
 };
 
-function createCard(item, index) {
-    const img = getImageUrl(item);
-    const rating = item.CommunityRating || '';
-    const year = item.ProductionYear || '';
-    const href = `${getServerAddress()}/web/#/details?id=${item.Id}&serverId=${item.ServerId}`;
-
-    const card = document.createElement('div');
-    card.className = 'card portraitCard card-hoverable card-withuserdata';
-    card.dataset.index = index;
-    card.dataset.id = item.Id;
-    card.dataset.serverid = item.ServerId;
-    card.dataset.type = item.Type;
-    card.dataset.mediatype = item.Type || 'Unknown';
-    card.dataset.isfolder = 'false';
-    card.dataset.prefix = '';
-    card.dataset.jeRatingTagged = '1';
-
-    card.innerHTML = `
-        <div class="cardBox cardBox-bottompadded">
-            <div class="cardScalable">
-                <div class="cardPadder cardPadder-portrait lazy-hidden-children">
-                    <span class="cardImageIcon material-icons" aria-hidden="true">tv</span>
-                </div>
-                <canvas aria-hidden="true" width="20" height="20" class="blurhash-canvas lazy-hidden"></canvas>
-                <a href="${href}" class="cardImageContainer coveredImage cardContent itemAction lazy blurhashed lazy-image-fadein-fast"
-                   data-action="link" aria-label="${item.Name}"
-                   style="background-image:url('${img}');">
-                </a>
-                <div class="cardOverlayContainer itemAction" data-action="link">
-                    <button is="paper-icon-button-light"
-                        class="cardOverlayButton cardOverlayButton-hover itemAction paper-icon-button-light cardOverlayFab-primary"
-                        data-action="resume">
-                        <span class="material-icons cardOverlayButtonIcon cardOverlayButtonIcon-hover">play_arrow</span>
-                    </button>
-                    <div class="cardOverlayButton-br flex">
-                    </div>
-                </div>
-            </div>
-            <div class="cardText cardTextCentered cardText-first">
-                <bdi><a href="${href}" class="itemAction textActionButton">${item.Name}</a></bdi>
-            </div>
-            <div class="cardText cardTextCentered cardText-secondary">
-                <bdi>${year}</bdi>
-            </div>
-        </div>
-    `;
-    return card;
-}
-
 function isAlreadyReplaced(parent) {
     const exists = parent.querySelector('.custom-scroller');
     return exists;
