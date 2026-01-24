@@ -3,6 +3,7 @@
 A collection of useful JavaScript scripts and CSS snippets to enhance your [Jellyfin](https://github.com/jellyfin/jellyfin) web client and improve your overall experience.
 
 ## ⚠️ Disclaimer
+
 - These snippets are created by a new Jellyfin user (me). They prioritize compatibility over performance or efficiency.  
 - My JavaScript scripts are experimental and may rely on frequent `setInterval` checks, which can affect performance depending on your setup. Use them at your own discretion. Optimizations are possible by replacing intervals with event-based listeners where applicable.
 
@@ -38,8 +39,8 @@ Replace hyperlinks in search's suggestions with cards.
 ![Suggestion](https://i.imgur.com/2gE3kg4.png)
 
 You can configure:
-- `itemsCount` - number of items to display (default: 20) 
-- `horizontalScroll` - enable horizontal scrolling instead of vertical wrap (default: false)
+- `itemsCount` - number of items to display.
+- `horizontalScroll` - enable horizontal scrolling instead of vertical wrap.
 
 ```js
 const s = document.createElement("script");
@@ -111,11 +112,11 @@ document.head.appendChild(s);
 
 ---
 
-### Random dice on home sections
+### More buttons on home sections
 
-Improves [Jellyfin-Enhanced](https://github.com/n00bcodr/Jellyfin-Enhanced) to add random dice to all vertical categories in home sections.
+Adds "Hide Watched" and "Random Dice" buttons to specified sections (can be configured individually). Uses [Jellyfin-Enhanced](https://github.com/n00bcodr/Jellyfin-Enhanced) for random dice. This supports [KefinTweaks plugin](https://github.com/ranaldsgift/KefinTweaks) section IDs.
 
-![Dice](https://i.imgur.com/b5NXtAP.png)
+![Home Buttons](https://i.imgur.com/yFNgA4F.png)
 
 You can configure:
 - `diceButtonSection` - Comma-separated list of section identifiers or class names where the Random (dice) button should be added.
@@ -124,8 +125,8 @@ You can configure:
 ```js
 const s = document.createElement("script");
 s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/home-section-button.js";
-s.dataset.diceButtonSection = "LatestShows,RecentlyAddedShows,new-episodes,NextUp,ContinueWatchingNextUp,ContinueWatching";
-s.dataset.hideButtonSection = "LatestShows,RecentlyAddedShows,new-episodes,watchlist";
+s.dataset.diceButtonSection = "LatestShows,RecentlyAddedShows,new-episodes,watchlist,NextUp,ContinueWatchingNextUp,ContinueWatching";
+s.dataset.hideButtonSection = "LatestShows,RecentlyAddedShows,new-episodes";
 s.async = true;
 document.head.appendChild(s);
 ```
