@@ -117,9 +117,15 @@ Improves [Jellyfin-Enhanced](https://github.com/n00bcodr/Jellyfin-Enhanced) to a
 
 ![Dice](https://i.imgur.com/b5NXtAP.png)
 
+You can configure:
+- `diceButtonSection` - Comma-separated list of section identifiers or class names where the Random (dice) button should be added.
+- `hideButtonSection` - Comma-separated list of section identifiers or class names where the Hide Watched button should be added.
+
 ```js
 const s = document.createElement("script");
-s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/more-random-dice.js";
+s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/home-section-button.js";
+s.dataset.diceButtonSection = "LatestShows,RecentlyAddedShows,new-episodes,NextUp,ContinueWatchingNextUp,ContinueWatching";
+s.dataset.hideButtonSection = "LatestShows,RecentlyAddedShows,new-episodes,watchlist";
 s.async = true;
 document.head.appendChild(s);
 ```
