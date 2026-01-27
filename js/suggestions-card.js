@@ -22,7 +22,7 @@ function getUserId() {
             visibility: visible;
         }
         ${!HORIZONTAL_SCROLL ? `
-        .custom-scroller-container .emby-scrollbuttons.padded-right {
+        .searchSuggestions .custom-scroller-container .emby-scrollbuttons.padded-right {
             display: none !important;
         }
         ` : ''}
