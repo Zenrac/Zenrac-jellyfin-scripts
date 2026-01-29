@@ -160,6 +160,20 @@ document.head.appendChild(s);
 
 ---
 
+### Fixes Plugin Page on Android Mobile App
+
+[Plugin Pages](https://github.com/IAmParadox27/jellyfin-plugin-pages) does not work on android mobile app because of JQuery.
+This script loads JQuery then reloads Plugin Pages.
+
+```js
+const s = document.createElement("script");
+s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/plugin-pages-android.js";
+s.async = true;
+document.head.appendChild(s);
+```
+
+---
+
 ## All-in-one (JS and CSS)
 
 To get everything in one JS. Convenient but not customizable.
