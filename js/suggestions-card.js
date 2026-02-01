@@ -21,7 +21,13 @@ function getUserId() {
         .verticalSection.searchSuggestions:has(.custom-scroller) {
             visibility: visible;
         }
+        .verticalSection.searchSuggestions .sectionTitleContainer {
+            padding-left: 0px; !important;
+        }
         ${!HORIZONTAL_SCROLL ? `
+        .verticalSection.searchSuggestions .itemsContainer {
+            margin-left: 1.2em;
+        }
         .searchSuggestions .custom-scroller-container .emby-scrollbuttons.padded-right {
             display: none !important;
         }
