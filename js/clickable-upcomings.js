@@ -67,6 +67,14 @@
       .upcomingShowCard .cardImageContainer, .upcomingMovieCard .cardImageContainer { 
         cursor: pointer !important; 
       }
+      .UpcomingShows .cardText-first .itemAction:hover,
+      .UpcomingMovies .cardText-first .itemAction:hover {
+        text-decoration: underline;
+      }
+      .UpcomingShows .cardText .itemAction:hover,
+      .UpcomingMovies .cardText .itemAction:hover {
+        cursor: pointer;
+      }
     `;
     document.head.appendChild(style);
     console.debug(LOG, "style injected");
