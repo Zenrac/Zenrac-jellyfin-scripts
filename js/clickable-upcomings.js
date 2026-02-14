@@ -31,6 +31,31 @@
     return ApiClient._serverAddress || "";
   }
 
+  function waitForApiClient(timeout = 10000, interval = 100) {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      const check = () => {
+        if (window.ApiClient) return resolve();
+        if (Date.now() - start > timeout) return reject(new Error("ApiClient not available"));
+        setTimeout(check, interval);
+      };
+      check();
+    });
+  }
+
+  function waitForAuth(timeout = 15000, interval = 250) {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      const check = () => {
+        const token = ApiClient?.accessToken?.();
+        const userId = ApiClient?._currentUser?.Id;
+        if (token && userId) return resolve();
+        if (Date.now() - start > timeout) return reject(new Error("Auth not available"));
+        setTimeout(check, interval);
+      };
+      check();
+    });
+  }
   function ensureStyleTag() {
     if (document.getElementById("clickable-upcomings-style")) return;
     const style = document.createElement("style");
@@ -91,7 +116,7 @@
   }
 
   function attachCardLink(card, itemId, title) {
-    if (card.dataset.clickableUpcoming === "1") return;
+    if (card.dataset.clickableUpcoming === "1") return false;
 
     card.dataset.clickableUpcoming = "1";
     card.classList.add("clickable-upcoming");
@@ -115,6 +140,7 @@
         nav();
       }
     });
+    return true;
   }
 
   function getUpcomingCards(container) {
@@ -141,6 +167,7 @@
 
   function linkCards(container, map) {
     const cards = getUpcomingCards(container);
+    let linked = 0;
 
     for (const card of cards) {
       if (card.dataset.clickableUpcoming === "1") continue;
@@ -153,19 +180,20 @@
       if (!itemId) {
         const prefixId = findItemIdByPrefix(map, key);
         if (prefixId) {
-          attachCardLink(card, prefixId, rawTitle);
+          if (attachCardLink(card, prefixId, rawTitle)) linked += 1;
           continue;
         }
         continue;
       }
 
-      attachCardLink(card, itemId, rawTitle);
+      if (attachCardLink(card, itemId, rawTitle)) linked += 1;
     }
   }
 
   function findUpcomingSection() {
     const sections = document.querySelectorAll(".verticalSection");
     for (const section of sections) {
+      if (!isVisible(section)) continue;
       const titleAttr = section.getAttribute("title");
       if (titleAttr && isUpcomingLabel(titleAttr)) return section;
 
@@ -182,17 +210,33 @@
     return null;
   }
 
+  function isVisible(el) {
+    return !!el && el.offsetWidth > 0 && el.offsetHeight > 0;
+  }
+
   function findContainer() {
     const section = findUpcomingSection();
     if (!section) return null;
 
-    let container = section.querySelector(".emby-scroller-container.section3");
-    if (!container) container = section.querySelector(".emby-scroller-container");
-    if (!container) {
-      const card = section.querySelector(".upcoming-show-card, .upcoming-movie-card, .upcoming-movies-card, .card");
-      if (card) container = card.closest(".emby-scroller-container") || card.parentElement;
+    let containers = Array.from(
+      section.querySelectorAll(".emby-scroller-container.section3")
+    ).filter(isVisible);
+    if (!containers.length) {
+      containers = Array.from(
+        section.querySelectorAll(".emby-scroller-container")
+      ).filter(isVisible);
     }
-    return container || null;
+    if (containers.length) return containers[0];
+
+    const cards = Array.from(
+      section.querySelectorAll(".upcoming-show-card, .upcoming-movie-card, .upcoming-movies-card, .card")
+    ).filter(isVisible);
+    if (cards.length) {
+      const card = cards[0];
+      const container = card.closest(".emby-scroller-container") || card.parentElement;
+      return isVisible(container) ? container : null;
+    }
+    return null;
   }
 
   async function init() {
@@ -209,20 +253,24 @@
     let map = null;
 
     let retryTimer = null;
+    let reapplyTimer = null;
 
     const startRetry = () => {
       if (retryTimer) return;
       let attempts = 0;
+      console.debug(LOG, "retry started");
       retryTimer = setInterval(() => {
         attempts += 1;
         const container = findContainer();
         if (container) {
+          console.debug(LOG, "container found after retry:", attempts);
           linkCards(container, map);
           clearInterval(retryTimer);
           retryTimer = null;
           return;
         }
         if (attempts >= 60) {
+          console.debug(LOG, "retry stopped; container not found");
           clearInterval(retryTimer);
           retryTimer = null;
         }
@@ -240,13 +288,25 @@
       subtree: true
     });
 
+    const startReapply = () => {
+      if (reapplyTimer) return;
+      reapplyTimer = setInterval(() => {
+        if (!map) return;
+        const container = findContainer();
+        if (container) linkCards(container, map);
+      }, 2000);
+    };
+
     try {
+      await waitForApiClient();
+      await waitForAuth();
       const events = await getArrEvents(start.toISOString(), end.toISOString());
       map = buildTitleToItemId(events);
 
       const container = findContainer();
       if (container) linkCards(container, map);
       else startRetry();
+      startReapply();
     } catch (e) {
       console.error(LOG, "error:", e);
     }
