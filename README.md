@@ -53,20 +53,6 @@ document.head.appendChild(s);
 
 ---
 
-### Clickable Upcoming Cards (Shows/Movies)
-
-Makes Upcoming Shows/Upcoming Movies cards from [Home Screen Sections](https://github.com/IAmParadox27/jellyfin-plugin-home-sections) clickable by linking them to the item details page.  
-Uses the [Jellyfin-Enhanced](github.com/n00bcodr/Jellyfin-Enhanced) ARR calendar endpoint to map titles to item ids, with a prefix fallback for truncated titles.
-
-```js
-const s = document.createElement("script");
-s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/clickable-upcomings.js";
-s.async = true;
-document.head.appendChild(s);
-```
-
----
-
 ### Clickable Header Logo
 
 Allows clicking the header logo to return Home. Also modifies the 'Home' tab behavior to match the 'Home' in menu, fixing a issue with [Media Bar Plugin](https://github.com/IAmParadox27/jellyfin-plugin-media-bar). 
@@ -174,7 +160,7 @@ document.head.appendChild(s);
 
 ---
 
-### Fixes Plugin Page on Android Mobile App
+### Fix Plugin Page on Android Mobile App
 
 [Plugin Pages](https://github.com/IAmParadox27/jellyfin-plugin-pages) does not work on android mobile app because of JQuery.
 This script loads JQuery then reloads Plugin Pages.
@@ -182,6 +168,20 @@ This script loads JQuery then reloads Plugin Pages.
 ```js
 const s = document.createElement("script");
 s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/plugin-pages-android.js";
+s.async = true;
+document.head.appendChild(s);
+```
+
+---
+
+### Clickable Upcoming Cards (Shows/Movies)
+
+Makes Upcoming Shows/Upcoming Movies cards from [Home Screen Sections](https://github.com/IAmParadox27/jellyfin-plugin-home-sections) clickable by linking them to the item details page.  
+Uses the [Jellyfin-Enhanced](github.com/n00bcodr/Jellyfin-Enhanced) ARR calendar endpoint to map titles to Jellyfin items.
+
+```js
+const s = document.createElement("script");
+s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/clickable-upcomings.js";
 s.async = true;
 document.head.appendChild(s);
 ```
