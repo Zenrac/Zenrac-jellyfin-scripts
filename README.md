@@ -121,14 +121,25 @@ Adds "Hide Watched" and "Random Dice" buttons to specified sections (can be conf
 You can configure:
 - `diceButtonSection` - Comma-separated list of section identifiers or class names where the Random (dice) button should be added.
 - `hideButtonSection` - Comma-separated list of section identifiers or class names where the Hide Watched button should be added.
+- `countSection` - Comma-separated list of section identifiers or class names where the item count badge should be added (defaults to `NextUp`, `ContinueWatchingNextUp`, `ContinueWatching`, `watchlist`).
+
+To explicitly disable one of these features, set it to an empty string (`""`).
 
 ```js
 const s = document.createElement("script");
 s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/home-section-button.js";
 s.dataset.diceButtonSection = "LatestShows,RecentlyAddedShows,new-episodes,watchlist,NextUp,ContinueWatchingNextUp,ContinueWatching";
 s.dataset.hideButtonSection = "LatestShows,RecentlyAddedShows,new-episodes";
+s.dataset.countSection = "LatestShows,RecentlyAddedShows,new-episodes,watchlist,NextUp,ContinueWatchingNextUp,ContinueWatching";
 s.async = true;
 document.head.appendChild(s);
+```
+
+Disable examples:
+```js
+s.dataset.diceButtonSection = "";
+s.dataset.hideButtonSection = "";
+s.dataset.countSection = "";
 ```
 
 ---

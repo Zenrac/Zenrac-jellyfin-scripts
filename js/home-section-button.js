@@ -5,7 +5,23 @@
 */
 
 const scriptSectionButton = document.currentScript;
-const DICE_SECTION = scriptSectionButton?.dataset?.diceButtonSection ? scriptSectionButton.dataset.diceButtonSection.split(',').map(s => s.trim()) : [
+function parseSectionSetting(attributeName, fallbackSections) {
+    if (!scriptSectionButton || !scriptSectionButton.hasAttribute(attributeName)) {
+        return fallbackSections;
+    }
+
+    const rawValue = scriptSectionButton.getAttribute(attributeName) || '';
+    const normalized = rawValue.trim();
+    if (normalized === '') {
+        return [];
+    }
+
+    return rawValue.split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+}
+
+const DICE_SECTION = parseSectionSetting('data-dice-button-section', [
     'LatestShows',
     'RecentlyAddedShows',
     'NextUp',
@@ -13,12 +29,89 @@ const DICE_SECTION = scriptSectionButton?.dataset?.diceButtonSection ? scriptSec
     'ContinueWatching',
     'new-episodes',
     'watchlist'
-];
-const HIDE_SECTION = scriptSectionButton?.dataset?.hideButtonSection ? scriptSectionButton.dataset.hideButtonSection.split(',').map(s => s.trim()) : [
+]);
+const HIDE_SECTION = parseSectionSetting('data-hide-button-section', [
     'LatestShows',
     'RecentlyAddedShows',
     'new-episodes'
-];
+]);
+const DEFAULT_COUNT_SECTION = ['NextUp', 'ContinueWatchingNextUp', 'ContinueWatching', 'watchlist'];
+const COUNT_SECTION = parseSectionSetting('data-count-section', null);
+
+function ensureCountStyle() {
+    if (document.getElementById('section-count-style')) return;
+    const style = document.createElement('style');
+    style.id = 'section-count-style';
+    style.textContent = `
+        .sectionTitleContainer .section-count-badge {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1;
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--main-text, #fff);
+            display: inline-flex;
+            align-items: center;
+            align-self: center;
+            vertical-align: middle;
+            min-height: 24px;
+            margin-bottom: 0.35em;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+function getSectionItemCount(section) {
+    const cards = section.querySelectorAll('.card:not(.cardPlaceholder)');
+    return Array.from(cards).filter(card => card.offsetParent !== null).length;
+}
+
+function clearCountRetry(section) {
+    if (section._countRetryTimer) {
+        clearTimeout(section._countRetryTimer);
+        section._countRetryTimer = null;
+    }
+}
+
+function updateSectionCount(section, options = {}) {
+    const badge = section._countBadge;
+    if (!badge) return;
+
+    const { retryIfZero = false } = options;
+    const count = getSectionItemCount(section);
+    badge.textContent = `${count}`;
+    badge.title = `${count} items`;
+
+    if (!retryIfZero) return;
+
+    if (count > 0) {
+        section._countRetryAttempts = 0;
+        clearCountRetry(section);
+        return;
+    }
+
+    const attempts = section._countRetryAttempts || 0;
+    if (attempts >= 10 || section._countRetryTimer) return;
+
+    section._countRetryAttempts = attempts + 1;
+    section._countRetryTimer = setTimeout(() => {
+        section._countRetryTimer = null;
+        updateSectionCount(section, { retryIfZero: true });
+    }, 300);
+}
+
+function ensureCountBadge(section, titleContainer) {
+    ensureCountStyle();
+    if (!section._countBadge) {
+        const badge = document.createElement('span');
+        badge.className = 'section-count-badge';
+        titleContainer.appendChild(badge);
+        section._countBadge = badge;
+    }
+
+    updateSectionCount(section, { retryIfZero: true });
+}
 
 function createDiceButton(section) {
     const randomBtn = document.createElement('button');
@@ -81,6 +174,7 @@ function createHideButton(section) {
             const watched = card.querySelector('button[data-played="true"]');
             if (watched) card.style.display = hidden ? 'none' : '';
         });
+        updateSectionCount(section);
     };
     return hideBtn;
 }
@@ -124,6 +218,14 @@ function addSectionButtons() {
             const randomBtn = createDiceButton(section);
             titleContainer.appendChild(randomBtn);
         }
+
+        const countAllowed = COUNT_SECTION
+            ? COUNT_SECTION.some(cls => section.classList.contains(cls)) || COUNT_SECTION.includes(sectionId)
+            : (DEFAULT_COUNT_SECTION.some(cls => section.classList.contains(cls)) || DEFAULT_COUNT_SECTION.includes(sectionId));
+    
+        if (countAllowed && titleContainer) {
+            ensureCountBadge(section, titleContainer);
+        }
     });
 }
 
@@ -134,8 +236,23 @@ const handleNavigation = () => {
     }, 800);
 };
 
-window.addEventListener("popstate", handleNavigation);
-window.addEventListener("pageshow", handleNavigation);
-window.addEventListener("focus", handleNavigation);
+const originalPushState = history.pushState;
+history.pushState = function (...args) {
+    const result = originalPushState.apply(this, args);
+    handleNavigation();
+    return result;
+};
+
+const originalReplaceState = history.replaceState;
+history.replaceState = function (...args) {
+    const result = originalReplaceState.apply(this, args);
+    handleNavigation();
+    return result;
+};
+
+window.addEventListener('hashchange', handleNavigation);
+window.addEventListener('popstate', handleNavigation);
+window.addEventListener('pageshow', handleNavigation);
+window.addEventListener('focus', handleNavigation);
 
 init();
