@@ -64,6 +64,7 @@ function isNewSeasonEpisode(cardElement) {
 
 function addNewBadgeToCard(cardElement) {
     if (cardElement.dataset.newSeasonBadged === '1') return false;
+    if (!cardElement.closest('.sections')) return false;
     if (!isNewSeasonEpisode(cardElement)) return false;
 
     // Find the language overlay container
@@ -89,8 +90,8 @@ function addNewBadgeToCard(cardElement) {
 function processAllCardsWithRetry() {
     ensureNewSeasonStyle();
 
-    // Query cards in visible sections
-    const cards = document.querySelectorAll('.card-withuserdata[data-type="Episode"]');
+    // Query cards in .sections containers only
+    const cards = document.querySelectorAll('.sections .card-withuserdata[data-type="Episode"]');
     let processed = 0;
 
     cards.forEach(card => {
