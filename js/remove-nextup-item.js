@@ -2,8 +2,10 @@
     Adds a "remove from Next Up" button to items in the Continue Watching / Next Up sections.
 */
 
+let tickInterval = null;
+
 function getUserId() {
-    if (!window.ApiClient) return null;    
+    if (!window.ApiClient) return null;
     return window.ApiClient?._currentUser?.Id;
 }
 
@@ -66,4 +68,41 @@ function tick() {
     });
 }
 
-setInterval(tick, 300);
+function startTickPolling() {
+    if (tickInterval) return;
+    tickInterval = setInterval(tick, 300);
+}
+
+function stopTickPolling() {
+    if (tickInterval) {
+        clearInterval(tickInterval);
+        tickInterval = null;
+    }
+}
+
+// Start polling on load
+startTickPolling();
+
+// Watch for section changes - stop polling when navigating away
+const handleNavigation = () => {
+    stopTickPolling();
+    setTimeout(startTickPolling, 800);
+};
+
+const originalPushState = history.pushState;
+history.pushState = function (...args) {
+    const result = originalPushState.apply(this, args);
+    handleNavigation();
+    return result;
+};
+
+const originalReplaceState = history.replaceState;
+history.replaceState = function (...args) {
+    const result = originalReplaceState.apply(this, args);
+    handleNavigation();
+    return result;
+};
+
+window.addEventListener('hashchange', handleNavigation);
+window.addEventListener('popstate', handleNavigation);
+window.addEventListener('pageshow', handleNavigation);

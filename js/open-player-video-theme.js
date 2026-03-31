@@ -2,16 +2,23 @@
     When playing a video theme song (Settings > Display > Theme videos), adds a button to open the video player in a popup overlay.
 */
 
+let mainCheckInterval = null;
+
 function showVideoPopup(container) {
-  if (!container) return
-  if (!container._controlsInterval) {
-    container._controlsInterval = setInterval(function() {
-      container.querySelectorAll('video').forEach(function(v){ v.controls = true })
-    }, 300)
+  if (!container) return;
+
+  // Clear any existing controls interval from previous popups
+  if (container._controlsInterval) {
+    clearInterval(container._controlsInterval);
   }
 
-  var overlay = document.createElement('div')
-  overlay.id = 'videoOverlay'
+  // Set up controls interval only for this popup
+  container._controlsInterval = setInterval(function() {
+    container.querySelectorAll('video').forEach(function(v){ v.controls = true });
+  }, 300);
+
+  var overlay = document.createElement('div');
+  overlay.id = 'videoOverlay';
   Object.assign(overlay.style, {
     position: 'fixed',
     inset: '0',
@@ -23,10 +30,10 @@ function showVideoPopup(container) {
     zIndex: '98',
     opacity: '0',
     transition: 'opacity 0.3s',
-  })
-  document.body.appendChild(overlay)
+  });
+  document.body.appendChild(overlay);
 
-  var wrapper = document.createElement('div')
+  var wrapper = document.createElement('div');
   Object.assign(wrapper.style, {
     width: '80%',
     height: '80%',
@@ -40,77 +47,124 @@ function showVideoPopup(container) {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  })
+  });
 
-  var originalParent = container.parentNode
-  var nextSibling = container.nextSibling
-  wrapper.appendChild(container)
-  overlay.appendChild(wrapper)
+  var originalParent = container.parentNode;
+  var nextSibling = container.nextSibling;
+  wrapper.appendChild(container);
+  overlay.appendChild(wrapper);
 
   requestAnimationFrame(function() {
-    overlay.style.opacity = '1'
-    wrapper.style.transform = 'scale(1)'
-  })
+    overlay.style.opacity = '1';
+    wrapper.style.transform = 'scale(1)';
+  });
+
+  var checkInterval = null;
 
   function closePopup() {
-    overlay.style.opacity = '0'
-    wrapper.style.transform = 'scale(0.8)'
+    overlay.style.opacity = '0';
+    wrapper.style.transform = 'scale(0.8)';
     setTimeout(function() {
       if (originalParent) {
-        if (nextSibling) originalParent.insertBefore(container, nextSibling)
-        else originalParent.appendChild(container)
+        if (nextSibling) originalParent.insertBefore(container, nextSibling);
+        else originalParent.appendChild(container);
       }
-      overlay.remove()
-      clearInterval(checkInterval)
-    }, 300)
-    overlay.removeEventListener('click', overlayClick)
-    document.removeEventListener('keydown', escHandler)
+      overlay.remove();
+
+      // Clear intervals when closing
+      if (checkInterval) clearInterval(checkInterval);
+      if (container._controlsInterval) {
+        clearInterval(container._controlsInterval);
+        container._controlsInterval = null;
+      }
+    }, 300);
+    overlay.removeEventListener('click', overlayClick);
+    document.removeEventListener('keydown', escHandler);
   }
 
   function overlayClick(e) {
-    if (e.target === overlay) closePopup()
+    if (e.target === overlay) closePopup();
   }
 
   function escHandler(e) {
-    if (e.key === 'Escape') closePopup()
+    if (e.key === 'Escape') closePopup();
   }
 
-  overlay.addEventListener('click', overlayClick)
-  document.addEventListener('keydown', escHandler)
+  overlay.addEventListener('click', overlayClick);
+  document.addEventListener('keydown', escHandler);
 
-  var checkInterval = setInterval(function() {
-    if (!document.querySelector('.videoPlayerContainer:not(.themeVideoPlayerContainer)')) closePopup()
-  }, 300)
+  checkInterval = setInterval(function() {
+    if (!document.querySelector('.videoPlayerContainer:not(.themeVideoPlayerContainer)')) closePopup();
+  }, 300);
 }
 
-setInterval(function() {
-    var videoContainer = document.querySelector('.videoPlayerContainer:not(.themeVideoPlayerContainer)');
-    if (!videoContainer) return 
+function checkAndAddButton() {
+  var videoContainer = document.querySelector('.videoPlayerContainer:not(.themeVideoPlayerContainer)');
+  if (!videoContainer) return;
 
-    var videoEl = videoContainer.querySelector('video');
-    if (!videoEl || !videoEl.src) return;
-    if (videoEl.src.startsWith('blob:')) return;
+  var videoEl = videoContainer.querySelector('video');
+  if (!videoEl || !videoEl.src) return;
+  if (videoEl.src.startsWith('blob:')) return;
 
-    var containers = document.querySelectorAll('.mainDetailButtons.focuscontainer-x')
-    var buttonContainer = Array.from(containers).find(c => c.clientWidth > 0 && c.clientHeight > 0)
-    if (!buttonContainer) return
+  var containers = document.querySelectorAll('.mainDetailButtons.focuscontainer-x');
+  var buttonContainer = Array.from(containers).find(c => c.clientWidth > 0 && c.clientHeight > 0);
+  if (!buttonContainer) return;
 
-    var existingBtn = buttonContainer.querySelector('#videoPopupBtn')
-    var isHidden = existingBtn ? existingBtn.clientWidth === 0 && existingBtn.clientHeight === 0 : true
-    if (!existingBtn || isHidden) {
-        if (existingBtn) existingBtn.remove()
-        var popupBtn = document.createElement('button')
-        popupBtn.id = 'videoPopupBtn'
-        popupBtn.type = 'button'
-        popupBtn.className = 'button-flat detailButton emby-button'
-        popupBtn.title = 'Open Video Popup'
-        popupBtn.innerHTML = '<div class="detailButton-content"><span class="material-icons detailButton-icon open_in_full" aria-hidden="true"></span></div>'
-        buttonContainer.appendChild(popupBtn)
-        popupBtn.addEventListener('click', function() {
-            var c = document.querySelector('.videoPlayerContainer')
-            if (!c) return
-            if (c.closest('#videoOverlay')) return
-            showVideoPopup(c)
-        })
-    }
-}, 300)
+  var existingBtn = buttonContainer.querySelector('#videoPopupBtn');
+  var isHidden = existingBtn ? existingBtn.clientWidth === 0 && existingBtn.clientHeight === 0 : true;
+  if (!existingBtn || isHidden) {
+    if (existingBtn) existingBtn.remove();
+    var popupBtn = document.createElement('button');
+    popupBtn.id = 'videoPopupBtn';
+    popupBtn.type = 'button';
+    popupBtn.className = 'button-flat detailButton emby-button';
+    popupBtn.title = 'Open Video Popup';
+    popupBtn.innerHTML = '<div class="detailButton-content"><span class="material-icons detailButton-icon open_in_full" aria-hidden="true"></span></div>';
+    buttonContainer.appendChild(popupBtn);
+    popupBtn.addEventListener('click', function() {
+      var c = document.querySelector('.videoPlayerContainer');
+      if (!c) return;
+      if (c.closest('#videoOverlay')) return;
+      showVideoPopup(c);
+    });
+  }
+}
+
+function startMainCheck() {
+  if (mainCheckInterval) return;
+  mainCheckInterval = setInterval(checkAndAddButton, 300);
+}
+
+function stopMainCheck() {
+  if (mainCheckInterval) {
+    clearInterval(mainCheckInterval);
+    mainCheckInterval = null;
+  }
+}
+
+// Start on load
+startMainCheck();
+
+// Navigation hooks to stop/restart
+const handleNavigation = () => {
+  stopMainCheck();
+  setTimeout(startMainCheck, 800);
+};
+
+const originalPushState = history.pushState;
+history.pushState = function (...args) {
+  const result = originalPushState.apply(this, args);
+  handleNavigation();
+  return result;
+};
+
+const originalReplaceState = history.replaceState;
+history.replaceState = function (...args) {
+  const result = originalReplaceState.apply(this, args);
+  handleNavigation();
+  return result;
+};
+
+window.addEventListener('hashchange', handleNavigation);
+window.addEventListener('popstate', handleNavigation);
+window.addEventListener('pageshow', handleNavigation);

@@ -199,13 +199,37 @@ document.head.appendChild(s);
 
 ---
 
+### New Season Badge
+
+Adds a visual badge for series with a new season to make them easier to spot in lists.
+
+```js
+const s = document.createElement("script");
+s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/new-season-badge.js";
+s.async = true;
+document.head.appendChild(s);
+```
+
+---
+
 ## All-in-one (JS and CSS)
 
 To get everything in one JS. Convenient but not customizable.
 
+`all.js` loader version:
+
 ```js
 const s = document.createElement("script");
 s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/all.js";
+s.async = true;
+document.head.appendChild(s);
+```
+
+`combined.min.js` single-file version:
+
+```js
+const s = document.createElement("script");
+s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/combined.min.js";
 s.async = true;
 document.head.appendChild(s);
 ```

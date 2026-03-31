@@ -2,8 +2,9 @@
     Display video themes for items on their detail pages. Supports OP/ED ordering for anime.
 */
 
-const interval = setInterval(() => {
+let themeInterval = null;
 
+function initVideoThemes() {
     const listChildrenElems = document.querySelectorAll('#listChildrenCollapsible');
     const listChildren = Array.from(listChildrenElems).find(e => e.clientWidth !== 0 && e.clientHeight !== 0);
     if (!listChildren) {
@@ -14,7 +15,7 @@ const interval = setInterval(() => {
 
     if (existingElements) {
         var isHidden = existingElements.clientWidth === 0 && existingElements.clientHeight === 0;
-    
+
 
         if (isHidden) {
             document.querySelectorAll('#videoThemesSection').forEach(e => e.remove());
@@ -213,9 +214,56 @@ const interval = setInterval(() => {
                 if (!videos.length) {
                     container.textContent = 'No video themes found.';
                 }
+
+                // Stop polling once themes are loaded
+                if (themeInterval) {
+                    clearInterval(themeInterval);
+                    themeInterval = null;
+                }
             })
             .catch(err => console.error('Error fetching theme videos:', err));
     }
 
     listItemThemes();
-}, 500);
+}
+
+function startThemePolling() {
+    if (themeInterval) return;
+    themeInterval = setInterval(() => {
+        initVideoThemes();
+    }, 500);
+}
+
+// Start polling on page load
+startThemePolling();
+
+// Navigation hooks to restart polling if needed
+const originalPushState = history.pushState;
+history.pushState = function (...args) {
+    const result = originalPushState.apply(this, args);
+    if (themeInterval) {
+        clearInterval(themeInterval);
+        themeInterval = null;
+    }
+    startThemePolling();
+    return result;
+};
+
+const originalReplaceState = history.replaceState;
+history.replaceState = function (...args) {
+    const result = originalReplaceState.apply(this, args);
+    if (themeInterval) {
+        clearInterval(themeInterval);
+        themeInterval = null;
+    }
+    startThemePolling();
+    return result;
+};
+
+window.addEventListener('hashchange', () => {
+    if (themeInterval) {
+        clearInterval(themeInterval);
+        themeInterval = null;
+    }
+    startThemePolling();
+});
