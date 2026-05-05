@@ -131,21 +131,36 @@
     card.setAttribute("role", "link");
     card.setAttribute("tabindex", "0");
 
-    const nav = () => {
-      const target = `#/details?id=${encodeURIComponent(itemId)}`;
+    const getTarget = () => `#/details?id=${encodeURIComponent(itemId)}`;
+    const getTargetUrl = () => `${window.location.origin}/web/${getTarget()}`;
+
+    const nav = (e) => {
+      const target = getTarget();
       console.debug(LOG, "navigate:", title, "->", itemId);
+      if (e?.ctrlKey || e?.button === 1) {
+        window.open(getTargetUrl(), "_blank");
+        return;
+      }
       if (location.hash !== target) location.hash = target;
     };
 
     card.addEventListener("click", (e) => {
       if (e.target.closest("a,button,input,select,textarea")) return;
-      nav();
+      e.preventDefault();
+      nav(e);
+    });
+
+    card.addEventListener("auxclick", (e) => {
+      if (e.button !== 1) return;
+      if (e.target.closest("a,button,input,select,textarea")) return;
+      e.preventDefault();
+      nav(e);
     });
 
     card.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        nav();
+        nav(e);
       }
     });
     return true;

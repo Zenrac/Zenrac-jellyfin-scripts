@@ -53,6 +53,35 @@ document.head.appendChild(s);
 
 ---
 
+### Open Jellyfin Links in New Tab
+
+Allows Ctrl + click and middle click to open Jellyfin internal links in a new browser tab.
+Also supports the header Home button and the header Back button when a previous Jellyfin route is known in the current session.
+
+```js
+const s = document.createElement("script");
+s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/open-links-new-tab.js";
+s.async = true;
+document.head.appendChild(s);
+```
+
+---
+
+### Action Sheet Open in New Tab
+
+Adds an "Open in new tab" option to Jellyfin item action sheets opened from right click.
+
+![Action Sheet Open in New Tab](https://i.imgur.com/sgufneu.png)
+
+```js
+const s = document.createElement("script");
+s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/action-sheet-open-new-tab.js";
+s.async = true;
+document.head.appendChild(s);
+```
+
+---
+
 ### Clickable Header Logo
 
 Allows clicking the header logo to return Home. Also modifies the 'Home' tab behavior to match the 'Home' in menu, fixing a issue with [Media Bar Plugin](https://github.com/IAmParadox27/jellyfin-plugin-media-bar). 
@@ -144,6 +173,38 @@ s.dataset.countSection = "";
 
 ---
 
+### Clickable Upcoming Cards (Shows/Movies)
+
+![ClickableUpcoming](https://i.imgur.com/AxUM6Rm.png)
+
+Makes Upcoming Shows/Upcoming Movies cards from [Home Screen Sections](https://github.com/IAmParadox27/jellyfin-plugin-home-sections) clickable by linking them to the item details page.  
+Uses the [Jellyfin-Enhanced](github.com/n00bcodr/Jellyfin-Enhanced) ARR calendar endpoint to map titles to Jellyfin items.
+Supports Ctrl + click and middle click to open the item in a new browser tab.
+
+```js
+const s = document.createElement("script");
+s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/clickable-upcomings.js";
+s.async = true;
+document.head.appendChild(s);
+```
+
+---
+
+### New Season Badge
+
+![NewBadge](https://i.imgur.com/5b90iIi.png)
+
+Compatible with [Jellyfin-Enhanced](github.com/n00bcodr/Jellyfin-Enhanced) existing badges. Adds a visual badge for series with a new season to make them easier to spot in lists.
+
+```js
+const s = document.createElement("script");
+s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/new-season-badge.js";
+s.async = true;
+document.head.appendChild(s);
+```
+
+---
+
 ### Remove HTML Tags in MediaBar 
 
 A small fix for [Media Bar](https://github.com/IAmParadox27/jellyfin-plugin-media-bar) to remove buggy HTML tags from Shows descriptions.
@@ -179,33 +240,6 @@ This script loads JQuery then reloads Plugin Pages.
 ```js
 const s = document.createElement("script");
 s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/plugin-pages-android.js";
-s.async = true;
-document.head.appendChild(s);
-```
-
----
-
-### Clickable Upcoming Cards (Shows/Movies)
-
-Makes Upcoming Shows/Upcoming Movies cards from [Home Screen Sections](https://github.com/IAmParadox27/jellyfin-plugin-home-sections) clickable by linking them to the item details page.  
-Uses the [Jellyfin-Enhanced](github.com/n00bcodr/Jellyfin-Enhanced) ARR calendar endpoint to map titles to Jellyfin items.
-
-```js
-const s = document.createElement("script");
-s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/clickable-upcomings.js";
-s.async = true;
-document.head.appendChild(s);
-```
-
----
-
-### New Season Badge
-
-Adds a visual badge for series with a new season to make them easier to spot in lists.
-
-```js
-const s = document.createElement("script");
-s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/new-season-badge.js";
 s.async = true;
 document.head.appendChild(s);
 ```
