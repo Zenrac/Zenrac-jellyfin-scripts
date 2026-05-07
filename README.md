@@ -2,14 +2,9 @@
 
 A collection of useful JavaScript scripts and CSS snippets to enhance your [Jellyfin](https://github.com/jellyfin/jellyfin) web client and improve your overall experience.
 
-## ⚠️ Disclaimer
-
-- These snippets are created by a new Jellyfin user (me). They prioritize compatibility over performance or efficiency.  
-- My JavaScript scripts are experimental and may rely on frequent `setInterval` checks, which can affect performance depending on your setup. Use them at your own discretion. Optimizations are possible by replacing intervals with event-based listeners where applicable.
-
 ## 🛠️ Prerequisites
 
-- Tested on Jellyfin Web Client **v10.11.5**. Compatibility with other versions is not guaranteed.
+- Tested on Jellyfin Web Client **v10.11**. Compatibility with other versions is not guaranteed.
 - **CSS snippets** can be added directly via `Dashboard > Branding` or through external plugins.
 - **JavaScript scripts** can be added using [Jellyfin-JavaScript-Injector](https://github.com/n00bcodr/Jellyfin-JavaScript-Injector).
 
@@ -147,6 +142,8 @@ Adds "Hide Watched" and "Random Dice" buttons to specified sections (can be conf
 
 ![Home Buttons](https://i.imgur.com/yFNgA4F.png)
 
+![Home Button With Counts](https://i.imgur.com/00uIPSU.png)
+
 You can configure:
 - `diceButtonSection` - Comma-separated list of section identifiers or class names where the Random (dice) button should be added.
 - `hideButtonSection` - Comma-separated list of section identifiers or class names where the Hide Watched button should be added.
@@ -164,22 +161,13 @@ s.async = true;
 document.head.appendChild(s);
 ```
 
-Disable examples:
-```js
-s.dataset.diceButtonSection = "";
-s.dataset.hideButtonSection = "";
-s.dataset.countSection = "";
-```
-
 ---
 
 ### Clickable Upcoming Cards (Shows/Movies)
 
-![ClickableUpcoming](https://i.imgur.com/AxUM6Rm.png)
+Makes Upcoming Shows/Upcoming Movies cards from [Home Screen Sections](https://github.com/IAmParadox27/jellyfin-plugin-home-sections) clickable by linking them to the item details page. Uses the [Jellyfin-Enhanced](github.com/n00bcodr/Jellyfin-Enhanced) ARR calendar endpoint to map titles to Jellyfin items.
 
-Makes Upcoming Shows/Upcoming Movies cards from [Home Screen Sections](https://github.com/IAmParadox27/jellyfin-plugin-home-sections) clickable by linking them to the item details page.  
-Uses the [Jellyfin-Enhanced](github.com/n00bcodr/Jellyfin-Enhanced) ARR calendar endpoint to map titles to Jellyfin items.
-Supports Ctrl + click and middle click to open the item in a new browser tab.
+![ClickableUpcoming](https://i.imgur.com/AxUM6Rm.png)
 
 ```js
 const s = document.createElement("script");
@@ -192,9 +180,9 @@ document.head.appendChild(s);
 
 ### New Season Badge
 
-![NewBadge](https://i.imgur.com/5b90iIi.png)
-
 Compatible with [Jellyfin-Enhanced](github.com/n00bcodr/Jellyfin-Enhanced) existing badges. Adds a visual badge for series with a new season to make them easier to spot in lists.
+
+![NewBadge](https://i.imgur.com/5b90iIi.png)
 
 ```js
 const s = document.createElement("script");
@@ -208,6 +196,8 @@ document.head.appendChild(s);
 ### Remove HTML Tags in MediaBar 
 
 A small fix for [Media Bar](https://github.com/IAmParadox27/jellyfin-plugin-media-bar) to remove buggy HTML tags from Shows descriptions.
+
+![HTMLMediaBar](https://i.imgur.com/uOToLc3.png)
 
 ```js
 const s = document.createElement("script");
