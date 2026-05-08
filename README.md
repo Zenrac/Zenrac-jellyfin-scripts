@@ -29,9 +29,10 @@ A collection of useful JavaScript scripts and CSS snippets to enhance your [Jell
 
 ### Display cards in search suggestion
 
-Replace hyperlinks in search's suggestions with cards. 
+Replace hyperlinks in search's suggestions with cards. Uses [KefinTweaks plugin](https://github.com/ranaldsgift/KefinTweaks) card builder.
 
-![Suggestion](https://i.imgur.com/2gE3kg4.png)
+![Suggestion Before](https://i.imgur.com/r3EaAjq.png)
+![Suggestion](https://i.imgur.com/h93qErB.png)
 
 You can configure:
 - `itemsCount` - number of items to display.
@@ -268,9 +269,9 @@ document.head.appendChild(s);
 ## 🤝 Contribution Guidelines
 
 - Contributions are welcome! You can suggest new JS or CSS snippets, improvements to existing ones, or fixes.
-- Please make sure your code is compatible with Jellyfin Web Client **v10.11.5** or clearly specify if it targets other versions.
+- Please make sure your code is compatible with Jellyfin Web Client **v10.11+**.
 - Respect existing code style and naming conventions to keep the repository consistent.
-- For discussions, ideas, or questions, you can open an issue or join the [Jellyfin Community Discord](https://discord.gg/v7P9CAvCKZ). 
+- For discussions, ideas, or questions, you can open an issue or join the [Jellyfin Community Discord](https://discord.gg/v7P9CAvCKZ).
 
 ## Licence
 

@@ -4,8 +4,8 @@
 */
 
 const script = document.currentScript;
-const ITEMS_COUNT = script.dataset.itemsCount ? parseInt(script.dataset.itemsCount, 10) : 20;
-const HORIZONTAL_SCROLL = script.dataset.horizontalScroll === "true";
+const ITEMS_COUNT = script?.dataset.itemsCount ? parseInt(script?.dataset.itemsCount, 10) : 20;
+const HORIZONTAL_SCROLL = script?.dataset.horizontalScroll === "true";
 
 function getUserId() {
     const id = window.ApiClient?._currentUser?.Id || null;
