@@ -1,10 +1,9 @@
-
 /*
     Replaces the search suggestions section on the search page with cards instead of links.
 */
 
 const script = document.currentScript;
-const ITEMS_COUNT = script?.dataset.itemsCount ? parseInt(script?.dataset.itemsCount, 10) : 20;
+const ITEMS_COUNT = script?.dataset.itemsCount ? parseInt(script?.dataset.itemsCount, 10) : 16;
 const HORIZONTAL_SCROLL = script?.dataset.horizontalScroll === "true";
 
 function getUserId() {
@@ -22,7 +21,8 @@ function getUserId() {
             visibility: visible;
         }
         .verticalSection.searchSuggestions .sectionTitleContainer {
-            padding-left: 0px; !important;
+            padding-left: 0px !important;
+            justify-content: center !important;
         }
         ${!HORIZONTAL_SCROLL ? `
         .verticalSection.searchSuggestions .itemsContainer {
@@ -51,6 +51,9 @@ XMLHttpRequest.prototype.open = function(method, url, ...args) {
         !url.includes('searchTerm=')
     ) {
         const u = new URL(url, location.origin);
+        for (const key of [...u.searchParams.keys()]) {
+            if (key.toLowerCase() === 'parentid') u.searchParams.delete(key);
+        }
         u.searchParams.set('enableImages', 'true');
         u.searchParams.set('limit', ITEMS_COUNT.toString());
         u.searchParams.delete('imageTypeLimit');
@@ -78,7 +81,7 @@ XMLHttpRequest.prototype.send = function(...args) {
             } catch {
                 payload = this.responseText;
             }
-            startWatchingSuggestions(payload.Items || []);
+            onNewItems(payload.Items || []);
         }
     });
 
@@ -86,28 +89,65 @@ XMLHttpRequest.prototype.send = function(...args) {
 };
 
 function isAlreadyReplaced(parent) {
-    const exists = parent.querySelector('.custom-scroller');
-    return exists;
+    return !!parent.querySelector('.custom-scroller');
 }
 
 function needsReplacement(parent) {
-    const needed = !isAlreadyReplaced(parent) && parent.querySelector('a, button');
-    return needed;
+    return !isAlreadyReplaced(parent) && !!parent.querySelector('a, button');
 }
 
-async function replaceSuggestionContainer(items) {
-    await waitForCardBuilder();
+function loadImages(root) {
+    window.imageLoader?.lazyChildren?.(root);
 
+    const apply = () => {
+        root.querySelectorAll('[data-src]').forEach((el) => {
+            const src = el.getAttribute('data-src');
+            if (!src) return;
+            el.removeAttribute('data-src');
+
+            const img = new Image();
+            img.onload = () => {
+                if (el.tagName === 'IMG') el.src = src;
+                else el.style.backgroundImage = `url("${src}")`;
+                el.classList.remove('lazy', 'lazy-hidden');
+                el.querySelector(':scope > canvas.blurhash-canvas')?.remove();
+            };
+            img.onerror = () => console.warn('[suggestions] image not found', src);
+            img.src = src;
+        });
+    };
+
+    apply();
+
+    const obs = new MutationObserver(apply);
+    obs.observe(root, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['data-src']
+    });
+    setTimeout(() => obs.disconnect(), 5000);
+}
+
+let latestItems = [];
+let itemsToken = 0;
+let renderQueued = false;
+
+function renderSections(force) {
+    if (!latestItems.length || !window.cardBuilder) return;
+
+    const token = String(itemsToken);
     const sections = document.querySelectorAll('.verticalSection.searchSuggestions');
 
     for (const parent of sections) {
-        if (!needsReplacement(parent)) continue;
-        if (!items.length) continue;
+        const stale = isAlreadyReplaced(parent) && parent.dataset.suggestionsToken !== token;
+        if (!needsReplacement(parent) && !(force && stale)) continue;
 
         parent.innerHTML = '';
+        parent.dataset.suggestionsToken = token;
 
         const section = window.cardBuilder.renderCards(
-            items,
+            latestItems,
             'Suggestions',
             null
         );
@@ -120,28 +160,43 @@ async function replaceSuggestionContainer(items) {
                 itemsContainer.classList.add('vertical-wrap');
             }
         }
+
+        loadImages(parent);
     }
 }
 
-let suggestionObserver = null;
-
-function startWatchingSuggestions(items) {
-    if (suggestionObserver) return;
-
-    suggestionObserver = new MutationObserver((mutations, obs) => {
-        const sections = document.querySelectorAll('.verticalSection.searchSuggestions');
-        if (sections.length > 0) {
-            replaceSuggestionContainer(items);
-            obs.disconnect();
-            suggestionObserver = null;
-        }
-    });
-
-    suggestionObserver.observe(document.body, {
-        childList: true,
-        subtree: true
+function scheduleRender(force = false) {
+    if (renderQueued) return;
+    renderQueued = true;
+    requestAnimationFrame(() => {
+        renderQueued = false;
+        renderSections(force);
     });
 }
+
+async function onNewItems(items) {
+    if (!items.length) return;
+
+    latestItems = items;
+    itemsToken++;
+
+    try {
+        await waitForCardBuilder();
+    } catch (e) {
+        console.warn('[suggestions]', e);
+        return;
+    }
+
+    renderSections(true);
+}
+
+new MutationObserver(() => {
+    if (!latestItems.length || !location.hash.startsWith('#/search')) return;
+    scheduleRender(false);
+}).observe(document.body, {
+    childList: true,
+    subtree: true
+});
 
 function waitForCardBuilder(timeout = 5000, interval = 50) {
     return new Promise((resolve, reject) => {
