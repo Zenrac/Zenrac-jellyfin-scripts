@@ -97,7 +97,7 @@ function getHeaderButtonUrl(target) {
 }
 
 function handleNewTab(e) {
-    if (!e.ctrlKey && e.button !== 1) return;
+    if (!e.ctrlKey && e.button !== 1 && !e.metaKey && e.key !== 's') return;
 
     const url = getHeaderButtonUrl(e.target) || getJellyfinLinkUrl(getActionHref(e.target));
     if (!url) return;
