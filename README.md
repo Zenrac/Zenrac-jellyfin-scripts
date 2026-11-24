@@ -107,6 +107,21 @@ document.head.appendChild(s);
 ```
 ---
 
+### Dashboard Spectator Mode
+
+Adds an eye button to active playback cards on the Jellyfin dashboard. Administrators can open a synchronized spectator window for a user and follow movies or episodes currently playing on another session.
+
+![Dashboard Spectator Mode](https://i.imgur.com/HY8N49k.png)
+
+```js
+const s = document.createElement("script");
+s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/dashboard-spectator.js";
+s.async = true;
+document.head.appendChild(s);
+```
+
+---
+
 ### Video Theme Player Modal
 
 Enabling `Settings > Display > Theme videos` adds a button to open the video theme player in a modal.
