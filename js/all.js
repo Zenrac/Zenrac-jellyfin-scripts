@@ -16,7 +16,8 @@ const scripts = [
     "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/clickable-upcomings.js",
     "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/new-season-badge.js",
     "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/plugin-pages-android.js",
-    "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/dashboard-spectator.js"
+    "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/dashboard-spectator.js",
+    "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/subitlte-size-changer.js"
 ];
 
 const cssFiles = [

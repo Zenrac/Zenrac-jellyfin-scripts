@@ -122,6 +122,23 @@ document.head.appendChild(s);
 
 ---
 
+### Subtitle Size and Position Controls
+
+Adds an **Aa** button to the video player controls. Use the sliders to change subtitle size (50–300%) and vertical position.
+
+Settings apply to the current page session and reset when the page is reloaded.
+
+![Subtitle Size and Position Controls](https://i.imgur.com/ZHMVpGV.png)
+
+```js
+const s = document.createElement("script");
+s.src = "https://cdn.jsdelivr.net/gh/Zenrac/Zenrac-jellyfin-scripts@latest/js/subitlte-size-changer.js";
+s.async = true;
+document.head.appendChild(s);
+```
+
+---
+
 ### Video Theme Player Modal
 
 Enabling `Settings > Display > Theme videos` adds a button to open the video theme player in a modal.
